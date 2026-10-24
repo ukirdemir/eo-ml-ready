@@ -1,0 +1,11 @@
+.venv/
+data/
+artifacts/
+mlruns/
+mlflow.db
+.git/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.eumdac/
+credentials*

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eo-ml-ready"
+version = "0.1.0"
+description = "Turn geostationary satellite imagery into ML-ready datasets and a small convection nowcasting baseline."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "xarray",
+    "h5netcdf",
+    "h5py",
+    "fsspec",
+    "s3fs",
+    "zarr",
+]
+
+[project.optional-dependencies]
+train = ["torch"]
+track = ["mlflow"]
+eumetsat = ["eumdac", "satpy"]
+dev = ["pytest", "ruff", "matplotlib"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF", "ISC"]
