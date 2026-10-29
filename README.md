@@ -54,7 +54,7 @@ A Docker image (`docker build -t eo-ml-ready .`) runs the same modules, for exam
 | `src/eo_ml_ready/baseline.py` | Persistence forecast |
 | `src/eo_ml_ready/model.py`, `train.py` | Small U-Net, training, threshold tuning, evaluation |
 | `scripts/` | Inspect and plot single scenes |
-| `fallback/` | Diagnostics written for the EUMETSAT Data Store (scene inspection, download probe) |
+| `fallback/` | Diagnostics written for the EUMETSAT Data Store (scene inspection, download probe, adapter test) |
 | `docs/` | Dataset card, model card, tutorial, results table, figures |
 
 ## Design choices
@@ -79,11 +79,11 @@ A Docker image (`docker build -t eo-ml-ready .`) runs the same modules, for exam
 
 Development data are GOES-19 ABI Level 2 cloud and moisture imagery (ABI-L2-CMIPC) from the open NOAA bucket `noaa-goes19` on AWS, CONUS sector, 5-minute scans subsampled to 15 minutes. Details are in `docs/DATASET_CARD.md`.
 
-An adapter for EUMETSAT MSG SEVIRI (`eumdac`, collection `EO:EUM:DAT:MSG:HRSEVIRI`) is included in `fetch/eumetsat.py`. It has not yet been tested end to end against real downloads. The SEVIRI IR 10.8 µm channel is the natural counterpart of ABI C13, and 6.2 µm of C08.
+An adapter for EUMETSAT MSG SEVIRI (`eumdac`, collection `EO:EUM:DAT:MSG:HRSEVIRI`) is included in `fetch/eumetsat.py`. Listing and downloading a full-disk scene (187 MB zip) and reading it with satpy (`seviri_l1b_native`: 12 channels, 3712 x 3712 pixels, IR 10.8 µm and WV 6.2 µm in kelvin) were tested on 15 September 2026 with `fallback/test_seviri_adapter.py` and `fallback/inspect_scene.py`. The ingest step does not yet read SEVIRI, so no Zarr store has been built from it. The SEVIRI IR 10.8 µm channel is the natural counterpart of ABI C13, and 6.2 µm of C08.
 
 ## Roadmap
 
-- Test and use the SEVIRI adapter.
+- Add a SEVIRI reader to the ingest step, build a SEVIRI Zarr store and rerun the nowcast on it.
 - Longer period and several seasons; per-day and land/sea evaluation.
 - Object-based verification and spatial tolerance.
 - Precipitation targets from radar.
