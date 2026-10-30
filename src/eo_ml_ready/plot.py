@@ -109,8 +109,10 @@ def main() -> None:
     fig.suptitle("Cold-cloud (BT < 235 K) nowcast, +60 min", fontsize=12)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, dpi=100, bbox_inches="tight")
-    print(f"Saved {args.out} (origin {origin}, frame CSI persistence {persistence_csi:.2f}, "
-          f"CNN {cnn_csi:.2f})")
+    print(
+        f"Saved {args.out} (origin {origin}, frame CSI persistence {persistence_csi:.2f}, "
+        f"CNN {cnn_csi:.2f})"
+    )
 
 
 if __name__ == "__main__":

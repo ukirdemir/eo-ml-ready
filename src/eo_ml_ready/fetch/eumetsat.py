@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -44,14 +45,29 @@ class Eumetsat:
         ]
         return sorted(refs, key=lambda ref: ref.time)
 
-    def download(self, ref: SceneRef, dest: Path) -> Path:
-        """Download a product zip into dest unless it is already there."""
+    def download(self, ref: SceneRef, dest: Path, attempts: int = 3) -> Path:
+        """Download a product zip into dest unless it is already there.
+
+        The file is written under a temporary name and renamed when complete, so an interrupted
+        download never leaves a truncated zip behind. Failed attempts are retried after a pause.
+        """
         dest.mkdir(parents=True, exist_ok=True)
         target = dest / f"{ref.key}.zip"
-        if not target.exists():
-            product = self.datastore().get_product(
-                product_id=ref.key, collection_id=self.collection
-            )
-            with product.open() as source, target.open("wb") as out:
-                shutil.copyfileobj(source, out)
+        if target.exists():
+            return target
+        partial = target.with_suffix(".part")
+        for attempt in range(1, attempts + 1):
+            try:
+                product = self.datastore().get_product(
+                    product_id=ref.key, collection_id=self.collection
+                )
+                with product.open() as source, partial.open("wb") as out:
+                    shutil.copyfileobj(source, out)
+                partial.replace(target)
+                return target
+            except Exception:
+                partial.unlink(missing_ok=True)
+                if attempt == attempts:
+                    raise
+                time.sleep(10 * attempt)
         return target

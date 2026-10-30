@@ -21,6 +21,7 @@ dependencies = [
 train = ["torch"]
 track = ["mlflow"]
 eumetsat = ["eumdac", "satpy"]
+advection = ["opencv-python-headless"]
 dev = ["pytest", "ruff", "matplotlib"]
 
 [tool.setuptools.packages.find]
