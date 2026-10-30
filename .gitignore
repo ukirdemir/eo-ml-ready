@@ -12,3 +12,5 @@ credentials*
 *.nat
 *.zip
 *.egg-info/
+release/
+forecast.png

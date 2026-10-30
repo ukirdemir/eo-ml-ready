@@ -50,6 +50,24 @@ What the results say:
 
 Read the numbers together with the limitations below: the test period is two days.
 
+**Released weights.** The seed-0 models for GOES-19 and SEVIRI (about 2 MB each) are attached to the GitHub release, with a JSON file for each (input convention, threshold, test scores) and checksums. To run one on a frame of your own store:
+
+```
+python examples/predict.py --weights eo-ml-ready-unet-seviri-seed0.pt --store data/processed/seviri.zarr --origin 2026-09-09T12:00
+```
+
+The matching `.json` file must sit next to the weights. Seed 0 is the first run, taken by convention and not picked for its test score; the other seeds score within 0.01 CSI of it. The models were trained on ten days of one region each and are research baselines, not forecast products (see `docs/MODEL_CARD.md`).
+
+## Scaling up
+
+The pipeline was built and tested on ten days and two 1024 x 1024 windows, on one CPU laptop. Going from there to months or years of data, full-disk fields or a new sensor needs a few concrete changes. They are not implemented here.
+
+- **Data volume.** One SEVIRI day is 96 scenes of 187 MB (about 18 GB downloaded, 30 minutes on a home connection); a year would be about 6.5 TB and about 8 days of continuous downloading. The ingest already resumes by day and deletes raw files after cropping, so it can run in parallel over day ranges on separate machines or workers. A server-side subset (the EUMETSAT Data Tailor, or GOES regional files) would cut the transfer.
+- **Store layout.** The Zarr store (float16, chunks of one time step and 256 x 256 pixels) holds a few GB for ten days and scales linearly in time and area. For a year it would be about 150 GB; appending by day and chunking by time already match this. Several years or full-disk grids would need sharded or object-store storage and a catalogue of the time ranges present.
+- **Training.** Training now loads the training frames into memory (about 2.4 GB for six days). Longer periods need lazy, chunk-aligned reading with a data loader and shuffling across days, and a GPU. The model (0.49 M parameters) is not the limit; the input pipeline is.
+- **Evaluation.** Several seasons and regions allow per-regime scores and a bootstrap with many more blocks than the 8 used here, so the intervals become meaningful.
+- **New sensors.** A new source needs a provider (list and download) and a reader that returns the channels in a fixed order (`Source` in `ingest.py`). Meteosat Third Generation (FCI) would follow the SEVIRI path.
+
 ## Quick start
 
 GOES (open data, no account):
@@ -96,7 +114,8 @@ A Docker image (`docker build -t eo-ml-ready .`) runs the same modules, for exam
 | `src/eo_ml_ready/baseline.py` | Persistence and optical-flow advection forecasts |
 | `src/eo_ml_ready/model.py`, `train.py` | Small U-Net, training, threshold tuning, evaluation |
 | `src/eo_ml_ready/compare.py` | CNN seeds against persistence and advection with paired intervals |
-| `scripts/` | Inspect and plot single scenes; check a store (`check_store.py`, `plot_store_frame.py`) |
+| `scripts/` | Inspect and plot single scenes; check a store (`check_store.py`, `plot_store_frame.py`); package weights for a release (`export_weights.py`) |
+| `examples/predict.py` | Load released weights and forecast one frame |
 | `fallback/` | Diagnostics written for the EUMETSAT Data Store (scene inspection, download probe, adapter test) |
 | `docs/` | Dataset card, model card, tutorial, results table, figures |
 
