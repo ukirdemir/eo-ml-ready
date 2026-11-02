@@ -99,7 +99,7 @@ python -m eo_ml_ready.compare --store data/processed/seviri.zarr --runs artifact
 
 GOES ingest downloads about 7 GB in total. SEVIRI ingest downloads about 18 GB per day (187 MB per scene, 96 scenes) and took about 30 minutes per day on a home connection; raw files are deleted after cropping. Each store is a few GB on disk. Training takes 13-20 minutes per seed on a CPU (Intel Core Ultra 7 165H) and needs about 2.4 GB of RAM.
 
-A Docker image (`docker build -t eo-ml-ready .`) runs the same modules, for example `docker run -v ${PWD}/data:/app/data eo-ml-ready eo_ml_ready.ingest --start ...`.
+A Docker image (`docker build -t eo-ml-ready .`, about 2 minutes) runs the same modules, for example `docker run --rm -v ${PWD}/data:/app/data -v ${PWD}/artifacts:/app/artifacts eo-ml-ready eo_ml_ready.baseline --method advection --store data/processed/seviri.zarr --out artifacts/seviri/advection_docker.json`. The advection baseline run this way on the SEVIRI store gave the same scores as the native run (test CSI 0.617). The default image has no satpy, so it cannot ingest SEVIRI; add the `eumetsat` extra in the Dockerfile for that.
 
 ## Layout
 

@@ -5,7 +5,8 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 
 COPY pyproject.toml ./
 COPY src ./src
-RUN pip install --no-cache-dir -e ".[train,track]"
+# Add ",eumetsat" to read SEVIRI (satpy and eumdac make the image much larger).
+RUN pip install --no-cache-dir -e ".[train,track,advection]"
 
 ENV PYTHONUNBUFFERED=1
 VOLUME ["/app/data", "/app/artifacts"]
