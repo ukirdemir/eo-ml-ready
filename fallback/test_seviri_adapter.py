@@ -6,7 +6,7 @@ import argparse
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from eo_ml_ready.fetch.eumetsat import Eumetsat
+from eo_ml_ready.fetch import eofetch
 
 
 def main() -> None:
@@ -19,7 +19,7 @@ def main() -> None:
     start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
     end = start + timedelta(minutes=args.minutes)
 
-    provider = Eumetsat()
+    provider = eofetch.seviri()
     refs = provider.list_scenes(start, end)
     print(f"Found {len(refs)} scenes between {start:%H:%M} and {end:%H:%M} UTC")
     for ref in refs:

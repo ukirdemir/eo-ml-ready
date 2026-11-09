@@ -1,10 +1,4 @@
-"""Load released weights and forecast one frame: cold-cloud mask 60 minutes ahead.
-
-Usage (after downloading the weights and the matching .json from the release):
-
-    python examples/predict.py --weights eo-ml-ready-unet-goes19-seed0.pt
-        --store data/processed/goes.zarr --origin 2026-09-09T18:00
-"""
+"""Load released weights and forecast one frame: cold-cloud mask 60 minutes ahead."""
 
 from __future__ import annotations
 

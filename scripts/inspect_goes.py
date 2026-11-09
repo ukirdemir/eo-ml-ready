@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import xarray as xr
 
-from eo_ml_ready.fetch.goes_aws import GoesAws
+from eo_ml_ready.fetch import eofetch
 
 CHANNELS = ["C13", "C08"]
 
@@ -23,7 +23,7 @@ def main() -> None:
     args = parser.parse_args()
 
     start = datetime.fromisoformat(args.time).replace(tzinfo=UTC)
-    provider = GoesAws(satellite=args.satellite)
+    provider = eofetch.goes(args.satellite)
     for channel in CHANNELS:
         scenes = provider.list_scenes(start, start + timedelta(hours=1), channel)
         print(f"{channel}: {len(scenes)} scenes in the hour")

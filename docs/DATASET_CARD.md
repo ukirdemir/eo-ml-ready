@@ -51,7 +51,7 @@ Observed cold-cloud fraction (C13 < 235 K) at target time: validation 8.1%, test
 
 ### Source
 
-- Satellite and product: Meteosat SEVIRI Level 1.5 full-disk imagery (collection `EO:EUM:DAT:MSG:HRSEVIRI`, native format) from the EUMETSAT Data Store, retrieved with `eumdac`. Account and licence needed; see below.
+- Satellite and product: Meteosat SEVIRI Level 1.5 full-disk imagery (collection `EO:EUM:DAT:MSG:HRSEVIRI`, native format) from the EUMETSAT Data Store, retrieved with eo-fetch-api (which uses `eumdac`; the first stores were built with `eumdac` directly). Account and licence needed; see below.
 - Channels: IR 10.8 µm (window; counterpart of GOES C13) and WV 6.2 µm (upper-level water vapour; counterpart of C08), calibrated to brightness temperature in kelvin by satpy (`seviri_l1b_native`).
 - Cadence 15 minutes (one scene per time step); pixel size about 3 km at the sub-satellite point.
 - The native files are stored in scan order (south to north, east to west). The reader flips them to north-up and west-to-east before cropping, and takes the corner coordinates from the satpy area definition.

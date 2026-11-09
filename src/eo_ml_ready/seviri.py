@@ -1,5 +1,4 @@
-"""Read MSG SEVIRI native products (Data Store zip files) into north-up cropped brightness
-temperature, for the ingest step. Needs the ``eumetsat`` extra (satpy)."""
+"""Read MSG SEVIRI native products into north-up cropped brightness temperature."""
 
 from __future__ import annotations
 
@@ -14,19 +13,14 @@ from eo_ml_ready.ingest import Crop, Region, Source
 
 CHANNELS = ("IR_108", "WV_062")
 
-# North-up pixel window of the 3712 x 3712 full disk (pixel 1856, 1856 is near 0N, 0E).
-# About 26N to 3S and 12W to 15E: Sahel, Gulf of Guinea and northern Central Africa.
+# North-up pixel window of the 3712 x 3712 full disk (Sahel, Gulf of Guinea, Central Africa).
 SEVIRI_REGION = Region(row0=960, row1=1984, col0=1400, col1=2424)
 
 
 def orient_north_up(
     values: np.ndarray, x: np.ndarray, y: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, bool, bool]:
-    """Flip an array so that rows run north to south and columns west to east.
-
-    SEVIRI native files are stored in scan order (south to north, east to west). The flags tell
-    which axes were flipped, so that pixel indices can be mapped back to the original grid.
-    """
+    """Flip an array so that rows run north to south and columns west to east."""
     flip_cols = bool(x[0] > x[-1])
     flip_rows = bool(y[0] < y[-1])
     if flip_cols:

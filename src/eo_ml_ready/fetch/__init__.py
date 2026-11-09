@@ -1,6 +1,5 @@
-"""Provider adapters for downloading satellite scenes."""
+"""Scene providers for downloading satellite scenes (eo-fetch-api, the ``fetch`` extra)."""
 
 from eo_ml_ready.fetch.base import Provider, SceneRef
-from eo_ml_ready.fetch.goes_aws import GoesAws
 
-__all__ = ["GoesAws", "Provider", "SceneRef"]
+__all__ = ["Provider", "SceneRef"]

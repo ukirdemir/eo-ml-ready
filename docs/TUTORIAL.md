@@ -5,7 +5,7 @@ This walks through the pipeline with the default settings. Everything runs on a 
 ## 1. Install
 
 ```
-pip install -e ".[dev,train,track]"
+pip install -e ".[dev,train,track,fetch]"
 pytest
 ```
 
@@ -57,4 +57,4 @@ python -m eo_ml_ready.summarise --out docs/RESULTS.md
 
 ## 7. Add another data source
 
-Implement the `Provider` interface from `eo_ml_ready/fetch/base.py`: `list_scenes(start, end, channel)` returning `SceneRef` objects sorted by time, and `download(ref, dest)` returning a local path. The ingest step also needs a reader that returns brightness temperature and scan-angle coordinates for the window. `fetch/eumetsat.py` is a starting point for MSG SEVIRI.
+Implement the `Provider` interface from `eo_ml_ready/fetch/base.py`: `list_scenes(start, end, channel)` returning `SceneRef` objects sorted by time, and `download(ref, dest)` returning a local path. The ingest step also needs a reader that returns brightness temperature and scan-angle coordinates for the window. `fetch/eofetch.py` shows how a provider is built on eo-fetch-api; the SEVIRI reader in `seviri.py` is a starting point for another sensor.

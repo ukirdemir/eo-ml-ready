@@ -1,9 +1,4 @@
-"""Baselines for the cold-cloud nowcast: persistence and optical-flow advection.
-
-Persistence: the cold-cloud mask at t is the forecast for t+60.
-Advection: the brightness temperature at t is moved along the optical flow between t-15 and t
-(four more steps of the same flow, as a constant-motion assumption) and then thresholded.
-"""
+"""Baselines for the cold-cloud nowcast: persistence and optical-flow advection."""
 
 from __future__ import annotations
 

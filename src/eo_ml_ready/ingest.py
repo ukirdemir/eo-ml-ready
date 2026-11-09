@@ -14,7 +14,6 @@ import numpy as np
 import xarray as xr
 
 from eo_ml_ready.fetch.base import Provider, SceneRef
-from eo_ml_ready.fetch.goes_aws import GoesAws
 from eo_ml_ready.geo import scan_to_latlon
 
 CHANNELS = ("C13", "C08")
@@ -48,12 +47,7 @@ class Crop(NamedTuple):
 
 @dataclass(frozen=True)
 class Source:
-    """How the files of one sensor map to the stored channels.
-
-    ``scene_channels`` are the keys used to list and download scenes (GOES has one file per
-    channel; SEVIRI has one file holding all channels). ``read`` receives the downloaded paths of
-    one time step, in ``scene_channels`` order, and returns one Crop per stored channel.
-    """
+    """How the files of one sensor map to the stored channels."""
 
     name: str
     channels: tuple[str, ...]
@@ -125,11 +119,7 @@ def build_day(
     workers: int = 8,
     source: Source = GOES,
 ) -> tuple[xr.Dataset, dict, dict | None] | None:
-    """Download, crop and stack all complete time steps in [start, end).
-
-    Time steps are processed in small chunks so that only a few raw files are on disk at once.
-    Returns the dataset, the projection and the corner lat/lon (None if the source gives none).
-    """
+    """Download, crop and stack all complete time steps in [start, end)."""
     targets = target_times(start, end)
     matched = {
         key: match_scenes(provider.list_scenes(start - TOLERANCE, end + TOLERANCE, key), targets)
@@ -252,13 +242,14 @@ def main() -> None:
     start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
     end = datetime.fromisoformat(args.end).replace(tzinfo=UTC)
     region = Region(*args.region) if args.region else None
+    from eo_ml_ready.fetch import eofetch
+
     if args.source == "seviri":
-        from eo_ml_ready.fetch.eumetsat import Eumetsat
         from eo_ml_ready.seviri import SEVIRI
 
-        provider, source, workers = Eumetsat(), SEVIRI, args.workers or 4
+        provider, source, workers = eofetch.seviri(), SEVIRI, args.workers or 4
     else:
-        provider, source, workers = GoesAws(satellite=args.satellite), GOES, args.workers or 8
+        provider, source, workers = eofetch.goes(args.satellite), GOES, args.workers or 8
     ingest(
         provider,
         start,

@@ -73,7 +73,7 @@ The pipeline was built and tested on ten days and two 1024 x 1024 windows, on on
 GOES (open data, no account):
 
 ```
-pip install -e ".[dev,train,track,advection]"
+pip install -e ".[dev,train,track,advection,fetch]"
 pytest
 
 python -m eo_ml_ready.ingest --start 2026-09-01 --end 2026-09-11
@@ -84,10 +84,12 @@ python -m eo_ml_ready.summarise --out docs/RESULTS.md
 python -m eo_ml_ready.compare --store data/processed/goes.zarr --runs artifacts
 ```
 
-SEVIRI (needs an EUMETSAT Earth Observation Portal account, `eumdac --set-credentials`, and the Meteosat Core data licence):
+The downloads use [eo-fetch-api](https://pypi.org/project/eo-fetch-api/), installed by the `fetch` extra (Python 3.12 or 3.13). The rest of the package works without it.
+
+SEVIRI (needs an EUMETSAT Earth Observation Portal account, the Meteosat Core data licence and the credentials saved once with `eo-fetch login --provider eumetsat`; the old `eumdac --set-credentials` file works too):
 
 ```
-pip install -e ".[dev,train,eumetsat,advection]"
+pip install -e ".[dev,train,advection,fetch,eumetsat]"
 
 python -m eo_ml_ready.ingest --source seviri --start 2026-09-01 --end 2026-09-11 --workers 2
 python scripts/check_store.py
@@ -99,13 +101,13 @@ python -m eo_ml_ready.compare --store data/processed/seviri.zarr --runs artifact
 
 GOES ingest downloads about 7 GB in total. SEVIRI ingest downloads about 18 GB per day (187 MB per scene, 96 scenes) and took about 30 minutes per day on a home connection; raw files are deleted after cropping. Each store is a few GB on disk. Training takes 13-20 minutes per seed on a CPU (Intel Core Ultra 7 165H) and needs about 2.4 GB of RAM.
 
-A Docker image (`docker build -t eo-ml-ready .`, about 2 minutes) runs the same modules, for example `docker run --rm -v ${PWD}/data:/app/data -v ${PWD}/artifacts:/app/artifacts eo-ml-ready eo_ml_ready.baseline --method advection --store data/processed/seviri.zarr --out artifacts/seviri/advection_docker.json`. The advection baseline run this way on the SEVIRI store gave the same scores as the native run (test CSI 0.617). The default image has no satpy, so it cannot ingest SEVIRI; add the `eumetsat` extra in the Dockerfile for that.
+A Docker image (`docker build -t eo-ml-ready .`, about 2 minutes) runs the same modules, for example `docker run --rm -v ${PWD}/data:/app/data -v ${PWD}/artifacts:/app/artifacts eo-ml-ready eo_ml_ready.baseline --method advection --store data/processed/seviri.zarr --out artifacts/seviri/advection_docker.json`. The advection baseline run this way on the SEVIRI store gave the same scores as the native run (test CSI 0.617). The default image has neither eo-fetch-api nor satpy, so it cannot ingest; add the `fetch` extra (and `eumetsat` for SEVIRI) in the Dockerfile for that.
 
 ## Layout
 
 | Path | Purpose |
 |---|---|
-| `src/eo_ml_ready/fetch/` | Provider interface, GOES-on-AWS adapter, EUMETSAT adapter |
+| `src/eo_ml_ready/fetch/` | Provider interface and the adapter on eo-fetch-api (GOES on AWS, SEVIRI from the EUMETSAT Data Store) |
 | `src/eo_ml_ready/ingest.py` | Crop, stack and write the Zarr store for a source (GOES or SEVIRI); resumes by day |
 | `src/eo_ml_ready/seviri.py` | SEVIRI native reader (satpy): north-up flip, crop, corner coordinates |
 | `src/eo_ml_ready/geo.py` | GOES scan angles to latitude/longitude |

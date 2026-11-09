@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eo-ml-ready"
-version = "0.1.0"
+version = "0.2.0"
 description = "Turn geostationary satellite imagery into ML-ready datasets and a small convection nowcasting baseline."
 requires-python = ">=3.11"
 dependencies = [
@@ -20,7 +20,8 @@ dependencies = [
 [project.optional-dependencies]
 train = ["torch"]
 track = ["mlflow"]
-eumetsat = ["eumdac", "satpy"]
+fetch = ["eo-fetch-api"]  # downloads for ingest; needs Python 3.12 or 3.13
+eumetsat = ["satpy"]  # reads SEVIRI files (eo-fetch-api already includes it)
 advection = ["opencv-python-headless"]
 dev = ["pytest", "ruff", "matplotlib"]
 
@@ -32,6 +33,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
+extend-exclude = [".venv*"]
 src = ["src", "tests", "scripts"]
 
 [tool.ruff.lint]
