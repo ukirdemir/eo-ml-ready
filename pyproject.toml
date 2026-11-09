@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eo-ml-ready"
-version = "0.2.0"
+version = "0.3.0"
 description = "Turn geostationary satellite imagery into ML-ready datasets and a small convection nowcasting baseline."
 requires-python = ">=3.11"
 dependencies = [
